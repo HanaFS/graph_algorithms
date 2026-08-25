@@ -1,0 +1,9 @@
+# Runtime GUI dependencies
+matplotlib>=3.7.0
+networkx>=3.0
+
+# Development dependencies
+pytest>=7.0
+black>=21.0
+pylint>=2.12
+flake8>=4.0
