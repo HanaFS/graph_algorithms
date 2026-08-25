@@ -870,7 +870,7 @@ class GraphApp:
             self.btn_add_node.config(bg=SUCCESS, fg="white", text="Thêm đỉnh", highlightbackground="#86efac", highlightthickness=2)
         else:
             if hasattr(self, 'sec_node'): self.sec_node.config(fg=ACCENT)
-            self.btn_add_node.config(bg="#e2e8f0", fg="#64748b", text="Thêm đỉnh", highlightthickness=0)
+            self.btn_add_node.config(bg="#e2e8f0", fg="#64748b", text="Thêm đỉnh", highlightbackground="#ffffff", highlightthickness=2)
 
     def _check_add_edge_input(self, event=None):
         if not hasattr(self, 'btn_add_edge') or not hasattr(self, 'ef') or not hasattr(self, 'et'): return
@@ -881,7 +881,7 @@ class GraphApp:
             self.btn_add_edge.config(bg=SUCCESS, fg="white", text="Thêm cạnh", highlightbackground="#86efac", highlightthickness=2)
         else:
             if hasattr(self, 'sec_edge'): self.sec_edge.config(fg=ACCENT)
-            self.btn_add_edge.config(bg="#e2e8f0", fg="#64748b", text="Thêm cạnh", highlightthickness=0)
+            self.btn_add_edge.config(bg="#e2e8f0", fg="#64748b", text="Thêm cạnh", highlightbackground="#ffffff", highlightthickness=2)
 
     def _check_del_node_input(self, event=None):
         if not hasattr(self, 'btn_del_node') or not hasattr(self, 'e_del_node'): return
@@ -890,7 +890,7 @@ class GraphApp:
             if hasattr(self, 'sec_del'): self.sec_del.config(fg=ERROR)
             self.btn_del_node.config(bg=ERROR, fg="white", text="Xoá đỉnh", highlightbackground="#fca5a5", highlightthickness=2)
         else:
-            self.btn_del_node.config(bg="#e2e8f0", fg="#64748b", text="Xoá đỉnh", highlightthickness=0)
+            self.btn_del_node.config(bg="#e2e8f0", fg="#64748b", text="Xoá đỉnh", highlightbackground="#ffffff", highlightthickness=2)
             u = self.e_del_ef.get().strip() if hasattr(self, 'e_del_ef') else ""
             v = self.e_del_et.get().strip() if hasattr(self, 'e_del_et') else ""
             if not (u and v) and hasattr(self, 'sec_del'):
@@ -904,7 +904,7 @@ class GraphApp:
             if hasattr(self, 'sec_del'): self.sec_del.config(fg=ERROR)
             self.btn_del_edge.config(bg=ERROR, fg="white", text="Xoá cạnh", highlightbackground="#fca5a5", highlightthickness=2)
         else:
-            self.btn_del_edge.config(bg="#e2e8f0", fg="#64748b", text="Xoá cạnh", highlightthickness=0)
+            self.btn_del_edge.config(bg="#e2e8f0", fg="#64748b", text="Xoá cạnh", highlightbackground="#ffffff", highlightthickness=2)
             val = self.e_del_node.get().strip() if hasattr(self, 'e_del_node') else ""
             if not val and hasattr(self, 'sec_del'):
                 self.sec_del.config(fg=ACCENT)
@@ -913,14 +913,14 @@ class GraphApp:
         has_nodes = len(self.graph) > 0
         if hasattr(self, 'btn_redraw'):
             if has_nodes:
-                self.btn_redraw.config(bg=ACCENT2, fg="white", text="Vẽ lại", highlightthickness=2)
+                self.btn_redraw.config(bg=ACCENT2, fg="white", text="Vẽ lại", highlightbackground="#86efac", highlightthickness=2)
             else:
-                self.btn_redraw.config(bg="#e2e8f0", fg="#94a3b8", text="Vẽ lại", highlightthickness=0)
+                self.btn_redraw.config(bg="#e2e8f0", fg="#94a3b8", text="Vẽ lại", highlightbackground="#ffffff", highlightthickness=2)
         if hasattr(self, 'btn_save_img'):
             if has_nodes:
-                self.btn_save_img.config(bg=SUCCESS, fg="white", text="Lưu hình", highlightthickness=2)
+                self.btn_save_img.config(bg=SUCCESS, fg="white", text="Lưu hình", highlightbackground="#86efac", highlightthickness=2)
             else:
-                self.btn_save_img.config(bg="#e2e8f0", fg="#94a3b8", text="Lưu hình", highlightthickness=0)
+                self.btn_save_img.config(bg="#e2e8f0", fg="#94a3b8", text="Lưu hình", highlightbackground="#ffffff", highlightthickness=2)
 
     def _upd_info(self):
         nodes = sorted(self.graph)
@@ -983,7 +983,7 @@ class GraphApp:
         color = color or ACCENT
         b = tk.Label(parent, text=text, bg=color, fg=fg,
                      font=("Segoe UI", 9, "bold"), cursor="hand2",
-                     padx=10, pady=6)
+                     padx=10, pady=6, highlightthickness=2, highlightbackground="#ffffff")
         b.bind("<Button-1>", lambda _: cmd())
         b._base_bg = color
         
