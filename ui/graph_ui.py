@@ -441,38 +441,13 @@ class GraphApp:
             _mk(ra, ma, ca)
 
     def _bfs_run(self):
-        s = self.e_ts.get().strip()
-        if not self._chk(s): return
-        order, edges = self._bfs(s)
-        self._settext(self.rb, f"BFS từ '{s}':\n{' → '.join(order)}")
-        self.draw(hi_n=set(order), hi_e=set(edges), title=f"BFS từ '{s}'")
-        self.nb.select(0)
+        messagebox.showinfo("Thông báo", "Chức năng thuật toán đã được tách riêng. Vui lòng import từ src/.")
 
     def _dfs_run(self):
-        s = self.e_ts.get().strip()
-        if not self._chk(s): return
-        order, edges = self._dfs(s)
-        self._settext(self.rd, f"DFS từ '{s}':\n{' → '.join(order)}")
-        self.draw(hi_n=set(order), hi_e=set(edges), title=f"DFS từ '{s}'")
-        self.nb.select(0)
+        messagebox.showinfo("Thông báo", "Chức năng thuật toán đã được tách riêng. Vui lòng import từ src/.")
 
     def _cmp_trav(self, ra, ma, ca):
-        raw = getattr(self, ra).get("1.0", tk.END).strip()
-        man = getattr(self, ma).get().strip()
-        lbl = getattr(self, ca)
-        if not raw: lbl.config(text="Chạy thuật toán trước!", fg=WARNING); return
-        if not man: lbl.config(text="Nhập kết quả chạy tay!", fg=WARNING); return
-        algo = []
-        for line in raw.splitlines():
-            if "→" in line:
-                algo = [x.strip() for x in line.split("→") if x.strip()]; break
-        hand = [x.strip() for x in man.replace("→", ",").split(",") if x.strip()]
-        if algo == hand:
-            lbl.config(text="Kết quả KHỚP hoàn toàn!", fg=SUCCESS)
-        else:
-            lbl.config(text=f"Không khớp!\n"
-                            f"Thuật toán: {' → '.join(algo)}\n"
-                            f"Chạy tay:   {' → '.join(hand)}", fg=ERROR)
+        pass
 
     # ═══════════════════════════════════════════════════════════════════════════
     # TAB 4 – BIPARTITE
@@ -502,52 +477,8 @@ class GraphApp:
         self.cv4.get_tk_widget().pack(fill=tk.BOTH, expand=True, padx=8, pady=(0, 8))
 
     def _bip_check(self):
-        if not self.graph: messagebox.showwarning("", "Đồ thị đang trống!"); return
-        ok, cmap, why = self._is_bip()
-        self.ax4.clear()
-        self.ax4.set_facecolor(GRAPH_BG)
-        self.fig4.patch.set_facecolor(GRAPH_BG)
-        G   = self._nxg()
-        pos = nx.spring_layout(G, seed=42, k=2)
+        messagebox.showinfo("Thông báo", "Chức năng thuật toán đã được tách riêng. Vui lòng import từ src/.")
 
-        if ok:
-            self.bip_r.config(text="Đây LÀ đồ thị hai phía  (Bipartite Graph)!", fg=SUCCESS)
-            sa = sorted(n for n, c in cmap.items() if c == 0)
-            sb = sorted(n for n, c in cmap.items() if c == 1)
-            self.bip_d.config(
-                text=f"Tập A (màu xanh lam) : {{ {', '.join(sa)} }}\n"
-                     f"Tập B (màu cam)        : {{ {', '.join(sb)} }}\n\n"
-                     f"Mọi cạnh đều nối một đỉnh ở tập A với một đỉnh ở tập B.",
-                fg=TEXT)
-            nc = ["#3b82f6" if cmap.get(n, 0) == 0 else "#f97316" for n in G.nodes()]
-            leg = [Patch(facecolor="#3b82f6", label="Tập A"),
-                   Patch(facecolor="#f97316", label="Tập B")]
-        else:
-            self.bip_r.config(text="Đây KHÔNG phải đồ thị hai phía!", fg=ERROR)
-            self.bip_d.config(
-                text=f"Lý do: {why}\n\n"
-                     f"Đồ thị hai phía không được chứa chu trình có độ dài lẻ.",
-                fg=TEXT)
-            nc = ["#ef4444" for _ in G.nodes()]
-            leg = []
-
-        nx.draw_networkx_nodes(G, pos, ax=self.ax4, node_color=nc,
-                               node_size=850, edgecolors="white", linewidths=1.5)
-        nx.draw_networkx_labels(G, pos, ax=self.ax4,
-                                font_color="white", font_size=11, font_weight="bold")
-        d = self.directed.get()
-        if d:
-            nx.draw_networkx_edges(G, pos, ax=self.ax4,
-                                   edge_color=EDGE_DEFAULT, width=2,
-                                   arrows=True, arrowsize=18)
-        else:
-            nx.draw_networkx_edges(G, pos, ax=self.ax4,
-                                   edge_color=EDGE_DEFAULT, width=2,
-                                   arrows=False)
-        if leg:
-            self.ax4.legend(handles=leg, loc="upper right",
-                            facecolor="#334155", labelcolor="white", fontsize=10)
-        self.ax4.axis("off"); self.cv4.draw()
 
     # ═══════════════════════════════════════════════════════════════════════════
     # TAB 5 – SHORTEST PATH
@@ -616,161 +547,18 @@ class GraphApp:
             _mk(ra, mpa, mda, ca)
 
     def _dijk_run(self):
-        src, tgt = self.e_src.get().strip(), self.e_tgt.get().strip()
-        if not self._chk(src) or not self._chk(tgt): return
-        dist, prev = self._dijkstra(src)
-        path = self._mkpath(prev, src, tgt)
-        self._show_sp(self.rdi, src, tgt, dist, path, "Dijkstra")
-        if path:
-            pe = {(path[i], path[i+1]) for i in range(len(path)-1)}
-            self.draw(hi_n=set(path), hi_e=pe, title=f"Dijkstra: {src} → {tgt}")
-            self.nb.select(0)
+        messagebox.showinfo("Thông báo", "Chức năng thuật toán đã được tách riêng. Vui lòng import từ src/.")
 
     def _bf_run(self):
-        src, tgt = self.e_src.get().strip(), self.e_tgt.get().strip()
-        if not self._chk(src) or not self._chk(tgt): return
-        res = self._bellman_ford(src)
-        if res is None:
-            self._settext(self.rbf, "Đồ thị có chu trình trọng số âm!\n"
-                                    "    Bellman-Ford không thể giải quyết."); return
-        dist, prev = res
-        path = self._mkpath(prev, src, tgt)
-        self._show_sp(self.rbf, src, tgt, dist, path, "Bellman-Ford")
-        if path:
-            pe = {(path[i], path[i+1]) for i in range(len(path)-1)}
-            self.draw(hi_n=set(path), hi_e=pe, title=f"Bellman-Ford: {src} → {tgt}")
-            self.nb.select(0)
+        messagebox.showinfo("Thông báo", "Chức năng thuật toán đã được tách riêng. Vui lòng import từ src/.")
 
     def _show_sp(self, widget, src, tgt, dist, path, algo):
-        d = dist.get(tgt, math.inf)
-        if d == math.inf:
-            self._settext(widget, f"Không tìm thấy đường đi từ '{src}' đến '{tgt}'"); return
-        dv = int(d) if d == int(d) else d
-        lines = [
-            f"Đường đi ngắn nhất  ({src} → {tgt})",
-            f"  {'  →  '.join(path)}",
-            "",
-            f"Tổng khoảng cách: {dv}",
-            "",
-            f"Bảng khoảng cách từ '{src}'  ({algo}):",
-        ]
-        for nd in sorted(dist):
-            v = dist[nd]
-            vs = "∞" if v == math.inf else str(int(v) if v == int(v) else v)
-            lines.append(f"  d({nd}) = {vs}")
-        self._settext(widget, "\n".join(lines))
+        pass
 
     def _cmp_sp(self, ra, mpa, mda, ca):
-        raw = getattr(self, ra).get("1.0", tk.END).strip()
-        lbl = getattr(self, ca)
-        if not raw: lbl.config(text="Chạy thuật toán trước!", fg=WARNING); return
-        mpt = getattr(self, mpa).get().strip()
-        mdt = getattr(self, mda).get().strip()
-        if not mpt or not mdt:
-            lbl.config(text="Nhập đủ đường đi và khoảng cách!", fg=WARNING); return
-        try: mdist = float(mdt)
-        except ValueError:
-            lbl.config(text="Khoảng cách phải là số!", fg=WARNING); return
-        mpath = [x.strip() for x in mpt.replace("→", ",").split(",") if x.strip()]
-        adist, apath = None, []
-        for line in raw.splitlines():
-            if "Tổng khoảng cách:" in line:
-                try: adist = float(line.split(":")[1].strip())
-                except: pass
-            if "→" in line and "(" not in line and "Đường" not in line:
-                apath = [x.strip() for x in line.replace("  →  ", "→").split("→") if x.strip()]
-        d_ok = adist == mdist; p_ok = apath == mpath
-        if d_ok and p_ok:
-            lbl.config(text="Kết quả KHỚP hoàn toàn!", fg=SUCCESS)
-        else:
-            msg = "✖  Không khớp!\n"
-            if not d_ok: msg += f"Khoảng cách – Thuật toán: {adist}  |  Tay: {mdist}\n"
-            if not p_ok: msg += (f"Đường đi – TT: {' → '.join(apath)}\n"
-                                  f"           Tay: {' → '.join(mpath)}")
-            lbl.config(text=msg, fg=ERROR)
+        pass
 
-    # ═══════════════════════════════════════════════════════════════════════════
-    # PURE-PYTHON ALGORITHMS
-    # ═══════════════════════════════════════════════════════════════════════════
-    def _bfs(self, start):
-        visited, queue, order, edges = set(), deque([start]), [], []
-        par = {start: None}
-        while queue:
-            u = queue.popleft()
-            if u in visited: continue
-            visited.add(u); order.append(u)
-            for v, _ in sorted(self.graph.get(u, []), key=lambda x: x[0]):
-                if v not in visited:
-                    if v not in par: par[v] = u; edges.append((u, v))
-                    queue.append(v)
-        return order, edges
 
-    def _dfs(self, start):
-        visited, order, edges = set(), [], []
-        def r(u):
-            visited.add(u); order.append(u)
-            for v, _ in sorted(self.graph.get(u, []), key=lambda x: x[0]):
-                if v not in visited: edges.append((u, v)); r(v)
-        r(start)
-        return order, edges
-
-    def _dijkstra(self, src):
-        dist = {n: math.inf for n in self.graph}; dist[src] = 0
-        prev = {src: None}; heap = [(0, src)]
-        while heap:
-            d, u = heapq.heappop(heap)
-            if d > dist[u]: continue
-            for v, w in self.graph.get(u, []):
-                nd = dist[u] + w
-                if nd < dist[v]:
-                    dist[v] = nd; prev[v] = u
-                    heapq.heappush(heap, (nd, v))
-        return dist, prev
-
-    def _bellman_ford(self, src):
-        nodes = list(self.graph)
-        dist = {n: math.inf for n in nodes}; dist[src] = 0
-        prev = {src: None}
-        el = []
-        for u in self.graph:
-            for v, w in self.graph[u]:
-                el.append((u, v, w))
-                if not self.directed.get(): el.append((v, u, w))
-        for _ in range(len(nodes) - 1):
-            upd = False
-            for u, v, w in el:
-                if dist[u] != math.inf and dist[u] + w < dist[v]:
-                    dist[v] = dist[u] + w; prev[v] = u; upd = True
-            if not upd: break
-        for u, v, w in el:
-            if dist[u] != math.inf and dist[u] + w < dist[v]:
-                return None
-        return dist, prev
-
-    def _mkpath(self, prev, src, tgt):
-        if tgt not in prev and tgt != src: return []
-        path, cur = [], tgt
-        while cur is not None: path.append(cur); cur = prev.get(cur)
-        path.reverse()
-        return path if path and path[0] == src else []
-
-    def _is_bip(self):
-        color = {}
-        for start in self.graph:
-            if start in color: continue
-            queue = deque([start]); color[start] = 0
-            while queue:
-                u = queue.popleft()
-                nbs = [v for v, _ in self.graph.get(u, [])]
-                if not self.directed.get():
-                    for x in self.graph:
-                        for v, _ in self.graph[x]:
-                            if v == u and x not in nbs: nbs.append(x)
-                for nb in nbs:
-                    if nb not in color: color[nb] = 1 - color[u]; queue.append(nb)
-                    elif color[nb] == color[u]:
-                        return False, color, f"Đỉnh '{u}' và '{nb}' cùng màu nhưng có cạnh nối"
-        return True, color, ""
 
     # ═══════════════════════════════════════════════════════════════════════════
     # GRAPH MANAGEMENT
