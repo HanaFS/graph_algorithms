@@ -40,6 +40,7 @@ class GraphApp:
         self.root.configure(bg=BG)
 
         self.graph: dict[str, list[tuple[str, float]]] = {}
+        self.history = []
         self.directed   = tk.BooleanVar(value=False)
         self._pos: dict = {}
 
@@ -137,19 +138,19 @@ class GraphApp:
         self.btn_add_edge = self._btn(self.sec_edge, "Thêm cạnh", self._add_edge, color="#e2e8f0", fg="#64748b")
         self.btn_add_edge.pack(fill=tk.X)
 
+        # ── action buttons ─────────────────────────────────────────────────
+        bf = tk.Frame(p, bg=BG)
+        bf.pack(side=tk.BOTTOM, fill=tk.X, pady=(4, 0))
+        self._btn(bf, "Làm mới",    self._refresh,  ACCENT2).pack(fill=tk.X, pady=(0, 4))
+        self._btn(bf, "Xóa sạch toàn bộ đồ thị", self._clear, ERROR).pack(fill=tk.X)
+
         # ── graph info ─────────────────────────────────────────────────────
         inf = self._section(p, "Đồ thị hiện tại", expand=True)
         self.info_t = tk.Text(inf, state="disabled",
                               bg="#f8fafc", fg=TEXT, relief="flat",
                               font=("Consolas", 8), wrap="word",
-                              borderwidth=1)
+                              borderwidth=1, height=2)
         self.info_t.pack(fill=tk.BOTH, expand=True)
-
-        # ── action buttons ─────────────────────────────────────────────────
-        bf = tk.Frame(p, bg=BG)
-        bf.pack(fill=tk.X, pady=(4, 0))
-        self._btn(bf, "Làm mới",    self._refresh,  ACCENT2).pack(fill=tk.X, pady=(0, 4))
-        self._btn(bf, "Xóa sạch toàn bộ đồ thị", self._clear, ERROR).pack(fill=tk.X)
 
     # ═══════════════════════════════════════════════════════════════════════════
     # NOTEBOOK – 5 TABS
@@ -220,6 +221,9 @@ class GraphApp:
         
         self.btn_redraw = self._btn(tb, "Vẽ lại",   self.draw,      ACCENT2)
         self.btn_redraw.pack(side=tk.RIGHT, padx=(0, 4), pady=6)
+
+        self.btn_undo = self._btn(tb, "Quay lại", self._undo, WARNING)
+        self.btn_undo.pack(side=tk.RIGHT, padx=(0, 4), pady=6)
         
         ttk.Separator(p, orient="horizontal").pack(fill=tk.X, padx=8)
 
@@ -563,6 +567,23 @@ class GraphApp:
     # ═══════════════════════════════════════════════════════════════════════════
     # GRAPH MANAGEMENT
     # ═══════════════════════════════════════════════════════════════════════════
+    def _save_state(self):
+        import copy
+        self.history.append(copy.deepcopy(self.graph))
+        if len(self.history) > 50:
+            self.history.pop(0)
+
+    def _undo(self):
+        if not self.history:
+            messagebox.showinfo("Thông báo", "Không có thao tác nào để quay lại!")
+            return
+        self.graph = self.history.pop()
+        self._pos = {}
+        self._upd_info()
+        self.draw()
+        self._update_action_buttons()
+        self._show_repr()
+
     def _nxg(self):
         G = nx.DiGraph() if self.directed.get() else nx.Graph()
         for nd in self.graph: G.add_node(nd)
@@ -577,6 +598,7 @@ class GraphApp:
         nm = self.e_node.get().strip()
         if not nm: messagebox.showwarning("", "Nhập tên đỉnh!"); return
         if nm in self.graph: messagebox.showwarning("", f"Đỉnh '{nm}' đã tồn tại!"); return
+        self._save_state()
         self.graph[nm] = []; self.e_node.delete(0, tk.END)
         self._pos = {}; self._upd_info(); self.draw()
         self._check_add_node_input()
@@ -593,6 +615,7 @@ class GraphApp:
             if nd not in self.graph: self.graph[nd] = []
         if any(nb == v for nb, _ in self.graph[u]):
             messagebox.showwarning("", f"Cạnh ({u} → {v}) đã tồn tại!"); return
+        self._save_state()
         self.graph[u].append((v, w))
         if not self.directed.get() and not any(nb == u for nb, _ in self.graph[v]):
             self.graph[v].append((u, w))
@@ -605,6 +628,7 @@ class GraphApp:
         if not hasattr(self, 'e_del_node'): return
         nm = self.e_del_node.get().strip()
         if not self._chk(nm): return
+        self._save_state()
         del self.graph[nm]
         for u in self.graph:
             self.graph[u] = [(v, w) for v, w in self.graph[u] if v != nm]
@@ -620,6 +644,10 @@ class GraphApp:
         v = self.e_del_et.get().strip()
         if not u or not v:
             messagebox.showwarning("", "Nhập cả đỉnh nguồn và đỉnh đích cần xóa!"); return
+            
+        import copy
+        old_graph = copy.deepcopy(self.graph)
+        
         found = False
         if u in self.graph:
             orig_len = len(self.graph[u])
@@ -628,6 +656,8 @@ class GraphApp:
         if not self.directed.get() and v in self.graph:
             self.graph[v] = [(nb, w) for nb, w in self.graph[v] if nb != u]
         if found:
+            self.history.append(old_graph)
+            if len(self.history) > 50: self.history.pop(0)
             self.e_del_ef.delete(0, tk.END)
             self.e_del_et.delete(0, tk.END)
             self._pos = {}; self._upd_info(); self.draw()
@@ -638,6 +668,7 @@ class GraphApp:
 
     def _clear(self):
         if messagebox.askyesno("Xác nhận", "Bạn có chắc chắn muốn xóa sạch toàn bộ đồ thị?"):
+            self._save_state()
             self.graph = {}; self._pos = {}; self._upd_info(); self.draw()
 
     def _type_changed(self): self._pos = {}; self.draw()
