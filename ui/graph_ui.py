@@ -148,8 +148,11 @@ class GraphApp:
             setattr(self, attr, e)
         self.ew.insert(0, "1")
         self.ef.bind("<KeyRelease>", self._check_add_edge_input)
+        self.ef.bind("<Return>", lambda _: self.et.focus_set())
         self.et.bind("<KeyRelease>", self._check_add_edge_input)
-        self.et.bind("<Return>", lambda _: self._add_edge())
+        self.et.bind("<Return>", lambda _: self.ew.focus_set())
+        self.ew.bind("<KeyRelease>", self._check_add_edge_input)  # Lỗi 1: thiếu bind ew
+        self.ew.bind("<Return>", lambda _: self._add_edge())       # Lỗi 2: Return phải ở ew
 
         self.btn_add_edge = self._btn(self.sec_edge, "Thêm cạnh", self._add_edge, color="#e2e8f0", fg="#64748b")
         self.btn_add_edge.pack(fill=tk.X)
@@ -902,16 +905,16 @@ class GraphApp:
         # Kiểm tra điều kiện
         ok, msg, suggested = check_euler_condition(self.graph)
         if not ok:
-            self._settext(self.r_fleury, f"❌ {msg}"); return
+            self._settext(self.r_fleury, f"{msg}"); return
 
         start = self.e_fleury_start.get().strip() or suggested
         if start not in self.graph:
-            self._settext(self.r_fleury, f"❌ Đỉnh '{start}' không hợp lệ."); return
+            self._settext(self.r_fleury, f"Đỉnh '{start}' không hợp lệ."); return
 
         try:
             path, steps = fleury(self.graph, start)
         except ValueError as err:
-            self._settext(self.r_fleury, f"❌ {err}"); return
+            self._settext(self.r_fleury, f"{err}"); return
 
         # Lưu steps để nút Tiến/Lùi dùng sau
         self._fleury_steps = steps
@@ -920,7 +923,7 @@ class GraphApp:
         # Hiển thị kết quả
         is_circuit = path[0] == path[-1]
         lines = [
-            "✅ " + ("Chu trình Euler tìm được:" if is_circuit else "Đường đi Euler tìm được:"),
+            ("Chu trình Euler tìm được:" if is_circuit else "Đường đi Euler tìm được:"),
             "   " + " → ".join(path),
             "",
             f"Số cạnh đã đi: {len(path) - 1}",
@@ -943,23 +946,23 @@ class GraphApp:
 
         ok, msg, suggested = check_euler_condition(self.graph)
         if not ok:
-            self._settext(self.r_hier, f"❌ {msg}"); return
+            self._settext(self.r_hier, f"{msg}"); return
 
         start = self.e_hier_start.get().strip() or suggested
         if start not in self.graph:
-            self._settext(self.r_hier, f"❌ Đỉnh '{start}' không hợp lệ."); return
+            self._settext(self.r_hier, f"Đỉnh '{start}' không hợp lệ."); return
 
         try:
             circuit, steps = hierholzer(self.graph, start)
         except ValueError as err:
-            self._settext(self.r_hier, f"❌ {err}"); return
+            self._settext(self.r_hier, f"{err}"); return
 
         self._hier_steps = steps
         self._hier_idx   = len(steps) - 1
 
         is_circuit = circuit[0] == circuit[-1]
         lines = [
-            "✅ " + ("Chu trình Euler (Hierholzer):" if is_circuit else "Đường đi Euler (Hierholzer):"),
+            ("Chu trình Euler (Hierholzer):" if is_circuit else "Đường đi Euler (Hierholzer):"),
             "   " + " → ".join(circuit),
             "",
             f"Số đỉnh: {len(circuit)}   |   Số cạnh: {len(circuit) - 1}",
@@ -983,12 +986,12 @@ class GraphApp:
         if not root:
             root = next(iter(self.graph))
         if root not in self.graph:
-            self._settext(self.r_prim, f"❌ Đỉnh '{root}' không hợp lệ."); return
+            self._settext(self.r_prim, f"Đỉnh '{root}' không hợp lệ."); return
 
         try:
             mst_edges, total_cost, steps = prim(self.graph, root)
         except ValueError as err:
-            self._settext(self.r_prim, f"❌ {err}"); return
+            self._settext(self.r_prim, f"{err}"); return
 
         self._prim_steps = steps
         self._prim_idx   = len(steps) - 1
@@ -996,7 +999,7 @@ class GraphApp:
         cost_str = str(int(total_cost)) if total_cost == int(total_cost) else f"{total_cost:.4g}"
         self.lbl_prim_cost.config(text=cost_str)
 
-        lines = [f"✅ MST từ đỉnh '{root}':"]
+        lines = [f"MST từ đỉnh '{root}':"]
         for u, v, w in mst_edges:
             wstr = str(int(w)) if w == int(w) else f"{w:.4g}"
             lines.append(f"  ({u} — {v})  w = {wstr}")
@@ -1015,7 +1018,7 @@ class GraphApp:
         try:
             mst_edges, total_cost, steps = kruskal(self.graph)
         except ValueError as err:
-            self._settext(self.r_kruskal, f"❌ {err}"); return
+            self._settext(self.r_kruskal, f"{err}"); return
 
         self._kruskal_steps = steps
         self._kruskal_idx   = len(steps) - 1
@@ -1023,7 +1026,7 @@ class GraphApp:
         cost_str = str(int(total_cost)) if total_cost == int(total_cost) else f"{total_cost:.4g}"
         self.lbl_kruskal_cost.config(text=cost_str)
 
-        lines = ["✅ Kruskal MST:"]
+        lines = ["Kruskal MST:"]
         for u, v, w in mst_edges:
             wstr = str(int(w)) if w == int(w) else f"{w:.4g}"
             lines.append(f"  ({u} — {v})  w = {wstr}")
@@ -1045,14 +1048,14 @@ class GraphApp:
             messagebox.showwarning("Thiếu thông tin",
                 "Vui lòng nhập đỉnh nguồn (Source) và đỉnh đích (Sink)."); return
         if src not in self.graph:
-            self._settext(self.r_ff, f"❌ Đỉnh nguồn '{src}' không tồn tại."); return
+            self._settext(self.r_ff, f" Đỉnh nguồn '{src}' không tồn tại."); return
         if snk not in self.graph:
-            self._settext(self.r_ff, f"❌ Đỉnh đích '{snk}' không tồn tại."); return
+            self._settext(self.r_ff, f"Đỉnh đích '{snk}' không tồn tại."); return
 
         try:
             max_flow, flow_on_edge, steps = ford_fulkerson(self.graph, src, snk)
         except ValueError as err:
-            self._settext(self.r_ff, f"❌ {err}"); return
+            self._settext(self.r_ff, f"{err}"); return
 
         self._ff_steps = steps
         self._ff_idx   = len(steps) - 1
@@ -1061,7 +1064,7 @@ class GraphApp:
         self.lbl_ff_flow.config(text=flow_str)
 
         augment_steps = [s for s in steps if s.get("action") == "augment"]
-        lines = [f"✅ Max Flow = {flow_str}  (Nguồn: {src} → Đích: {snk})", ""]
+        lines = [f"Max Flow = {flow_str}  (Nguồn: {src} → Đích: {snk})", ""]
         if augment_steps:
             lines.append(f"Số đường tăng luồng: {len(augment_steps)}")
             lines.append("")
@@ -1074,6 +1077,101 @@ class GraphApp:
             flow_on_edge, max_flow, src, snk
         )
 
+    def _load_sample_for_algo(self, algo_type):
+        """
+        Nạp đồ thị mẫu được cấu hình sẵn cho các bài test tương ứng.
+        Sử dụng trực tiếp các ví dụ ở hướng dẫn test để kiểm tra nhanh.
+        """
+        # Làm sạch đồ thị hiện có mà không hiện hộp thoại hỏi xác nhận
+        self.graph = {}
+        self._pos = {}
+
+        if algo_type in ["prim", "kruskal"]:
+            # Cây khung nhỏ nhất (MST) cần đồ thị vô hướng
+            self.directed.set(False)
+            self._pos = {}
+            
+            # Cạnh mẫu: (u, v, weight)
+            edges = [
+                ("A", "B", 4.0),
+                ("A", "C", 2.0),
+                ("B", "C", 1.0),
+                ("B", "D", 5.0),
+                ("C", "D", 8.0)
+            ]
+            for u, v, w in edges:
+                self.graph.setdefault(u, []).append((v, w))
+                self.graph.setdefault(v, []).append((u, w))
+            
+            # Điền đầu vào mặc định
+            if algo_type == "prim" and hasattr(self, 'e_prim_root'):
+                self.e_prim_root.delete(0, tk.END)
+                self.e_prim_root.insert(0, "A")
+                
+            self._upd_info()
+            if algo_type == "prim":
+                self.draw(ax=self.ax_prim, cv=self.cv_prim)
+            else:
+                self.draw(ax=self.ax_kruskal, cv=self.cv_kruskal)
+                
+        elif algo_type in ["fleury", "hierholzer"]:
+            # Euler Path/Circuit cần đồ thị vô hướng bậc lẻ hợp lệ
+            self.directed.set(False)
+            self._pos = {}
+            
+            edges = [
+                ("A", "B", 1.0),
+                ("A", "C", 1.0),
+                ("B", "C", 1.0),
+                ("B", "D", 1.0),
+                ("C", "D", 1.0)
+            ]
+            for u, v, w in edges:
+                self.graph.setdefault(u, []).append((v, w))
+                self.graph.setdefault(v, []).append((u, w))
+                
+            self._upd_info()
+            if algo_type == "fleury":
+                if hasattr(self, 'e_fleury_start'):
+                    self.e_fleury_start.delete(0, tk.END)
+                    self.e_fleury_start.insert(0, "B")
+                self.draw(ax=self.ax_fleury, cv=self.cv_fleury)
+            else:
+                if hasattr(self, 'e_hier_start'):
+                    self.e_hier_start.delete(0, tk.END)
+                    self.e_hier_start.insert(0, "B")
+                self.draw(ax=self.ax_hier, cv=self.cv_hier)
+                
+        elif algo_type == "ford_fulkerson":
+            # Ford-Fulkerson (Max Flow) yêu cầu đồ thị có hướng và sức chứa
+            self.directed.set(True)
+            self._pos = {}
+            
+            edges = [
+                ("S", "A", 10.0),
+                ("S", "B", 10.0),
+                ("A", "T", 8.0),
+                ("B", "T", 9.0),
+                ("A", "B", 2.0)
+            ]
+            for u, v, w in edges:
+                self.graph.setdefault(u, []).append((v, w))
+                if v not in self.graph:
+                    self.graph[v] = []
+                    
+            if hasattr(self, 'e_ff_src'):
+                self.e_ff_src.delete(0, tk.END)
+                self.e_ff_src.insert(0, "S")
+            if hasattr(self, 'e_ff_snk'):
+                self.e_ff_snk.delete(0, tk.END)
+                self.e_ff_snk.insert(0, "T")
+                
+            self._upd_info()
+            self.draw(ax=self.ax_ff, cv=self.cv_ff)
+
+        # Cập nhật cả khung vẽ chung của Tab 1
+        if hasattr(self, 'ax') and hasattr(self, 'canvas'):
+            self.draw()
 
     # ── 6.1 Fleury ───────────────────────────────────────────────────────────
 
@@ -1098,7 +1196,8 @@ class GraphApp:
         self.e_fleury_start = self._entry(left)
         self.e_fleury_start.pack(fill=tk.X, padx=10, pady=(0, 8))
 
-
+        self._btn(left, "Nạp đồ thị mẫu",
+                  lambda: self._load_sample_for_algo("fleury")).pack(fill=tk.X, padx=10, pady=(0, 6))
 
         self._btn(left, "Chạy Fleury",
                   lambda: self._run_fleury(),
@@ -1143,7 +1242,8 @@ class GraphApp:
         self.e_hier_start = self._entry(left)
         self.e_hier_start.pack(fill=tk.X, padx=10, pady=(0, 8))
 
-
+        self._btn(left, "Nạp đồ thị mẫu",
+                  lambda: self._load_sample_for_algo("hierholzer")).pack(fill=tk.X, padx=10, pady=(0, 6))
 
         self._btn(left, "Chạy Hierholzer",
                   lambda: self._run_hierholzer(),
@@ -1185,7 +1285,8 @@ class GraphApp:
         self.e_prim_root = self._entry(left)
         self.e_prim_root.pack(fill=tk.X, padx=10, pady=(0, 8))
 
-
+        self._btn(left, "Nạp đồ thị mẫu",
+                  lambda: self._load_sample_for_algo("prim")).pack(fill=tk.X, padx=10, pady=(0, 6))
 
         self._btn(left, "Chạy Prim",
                   lambda: self._run_prim(),
@@ -1225,7 +1326,8 @@ class GraphApp:
             badge_text="MST · Union-Find"
         )
 
-
+        self._btn(left, "Nạp đồ thị mẫu",
+                  lambda: self._load_sample_for_algo("kruskal")).pack(fill=tk.X, padx=10, pady=(0, 6))
 
         self._btn(left, "Chạy Kruskal",
                   lambda: self._run_kruskal(),
@@ -1279,7 +1381,8 @@ class GraphApp:
             e.pack(fill=tk.X, padx=10, pady=(0, 4))
             setattr(self, attr, e)
 
-
+        self._btn(left, "Nạp đồ thị mẫu",
+                  lambda: self._load_sample_for_algo("ford_fulkerson")).pack(fill=tk.X, padx=10, pady=(6, 6))
 
         self._btn(left, "Chạy Ford-Fulkerson",
                   lambda: self._run_ford_fulkerson(),
@@ -1407,14 +1510,14 @@ class GraphApp:
     _PROBLEM_DATA = {
         "Mạng phân phối điện (Kruskal – MST)": {
             "desc": (
-                "📍 Bài toán:\n"
+                "Bài toán:\n"
                 "Một công ty điện lực cần lắp đặt đường dây điện "
                 "kết nối 6 trạm biến áp với chi phí tối thiểu.\n\n"
-                "📌 Ánh xạ đồ thị:\n"
+                "Ánh xạ đồ thị:\n"
                 "  • Node = Trạm biến áp (A–F)\n"
                 "  • Edge = Tuyến cáp có thể lắp\n"
                 "  • Weight = Chi phí lắp (triệu đồng)\n\n"
-                "🎯 Cần tìm: Cây khung nhỏ nhất (MST) để "
+                "Cần tìm: Cây khung nhỏ nhất (MST) để "
                 "kết nối toàn bộ trạm với chi phí thấp nhất.\n\n"
                 "🔧 Thuật toán: Kruskal (sắp xếp cạnh + Union-Find)"
             ),
@@ -1428,14 +1531,14 @@ class GraphApp:
         },
         "Cấp nước thành phố (Prim – MST)": {
             "desc": (
-                "📍 Bài toán:\n"
+                "Bài toán:\n"
                 "Thành phố cần xây dựng hệ thống đường ống dẫn "
                 "nước từ nhà máy đến 5 khu dân cư.\n\n"
-                "📌 Ánh xạ đồ thị:\n"
+                "Ánh xạ đồ thị:\n"
                 "  • Node = Nhà máy / Khu dân cư (1–6)\n"
                 "  • Edge = Tuyến ống có thể xây\n"
                 "  • Weight = Chi phí xây dựng (tỷ đồng)\n\n"
-                "🎯 Cần tìm: MST đảm bảo nước tới mọi khu "
+                "Cần tìm: MST đảm bảo nước tới mọi khu "
                 "với tổng chi phí xây dựng thấp nhất.\n\n"
                 "🔧 Thuật toán: Prim (mở rộng từ đỉnh gốc)"
             ),
@@ -1449,16 +1552,16 @@ class GraphApp:
         },
         "Hệ thống ống dẫn dầu (Ford-Fulkerson – Max Flow)": {
             "desc": (
-                "📍 Bài toán:\n"
+                "Bài toán:\n"
                 "Một hệ thống ống dẫn dầu có nguồn (S) và đích (T). "
                 "Mỗi ống có sức chứa giới hạn. "
                 "Cần tối đa hóa lượng dầu vận chuyển từ S đến T.\n\n"
-                "📌 Ánh xạ đồ thị:\n"
+                "Ánh xạ đồ thị:\n"
                 "  • Node = Điểm giao ống / Trạm bơm\n"
                 "  • Edge (có hướng) = Ống dẫn dầu\n"
                 "  • Weight = Sức chứa (capacity) của ống\n\n"
-                "🎯 Cần tìm: Luồng cực đại (Max Flow) từ S đến T.\n\n"
-                "🔧 Thuật toán: Ford-Fulkerson (BFS – Edmonds-Karp)"
+                "Cần tìm: Luồng cực đại (Max Flow) từ S đến T.\n\n"
+                "Thuật toán: Ford-Fulkerson (BFS – Edmonds-Karp)"
             ),
             "algo": "Ford-Fulkerson",
             "nodes": ["S", "A", "B", "C", "D", "T"],
@@ -1471,16 +1574,16 @@ class GraphApp:
         },
         "Lịch trình thu rác (Fleury – Euler Path)": {
             "desc": (
-                "📍 Bài toán:\n"
+                "Bài toán:\n"
                 "Xe thu rác cần đi qua mỗi con phố đúng một lần "
                 "(mỗi cạnh = một đoạn đường) mà không lặp lại, "
                 "xuất phát và kết thúc tại kho.\n\n"
-                "📌 Ánh xạ đồ thị:\n"
+                "Ánh xạ đồ thị:\n"
                 "  • Node = Ngã tư / Điểm dừng\n"
                 "  • Edge = Đoạn đường giữa 2 ngã tư\n"
                 "  • Weight = Chiều dài đoạn (km)\n\n"
-                "🎯 Cần tìm: Đường đi Euler (qua mỗi cạnh đúng 1 lần).\n\n"
-                "🔧 Thuật toán: Fleury (kiểm tra cầu trước khi chọn cạnh)"
+                "Cần tìm: Đường đi Euler (qua mỗi cạnh đúng 1 lần).\n\n"
+                "Thuật toán: Fleury (kiểm tra cầu trước khi chọn cạnh)"
             ),
             "algo": "Fleury",
             "nodes": ["Kho", "N1", "N2", "N3", "N4"],
@@ -1493,16 +1596,16 @@ class GraphApp:
         },
         "Dò mạng cáp quang (Hierholzer – Euler Circuit)": {
             "desc": (
-                "📍 Bài toán:\n"
+                "Bài toán:\n"
                 "Kỹ thuật viên cần kiểm tra mọi sợi cáp quang trong "
                 "mạng vòng của tòa nhà, đi qua mỗi sợi đúng 1 lần "
                 "và quay về điểm xuất phát.\n\n"
-                "📌 Ánh xạ đồ thị:\n"
+                "Ánh xạ đồ thị:\n"
                 "  • Node = Hộp kết nối (patch panel)\n"
                 "  • Edge = Sợi cáp quang\n"
                 "  • Weight = Chiều dài sợi (m)\n\n"
-                "🎯 Cần tìm: Chu trình Euler (qua mỗi cạnh 1 lần, quay đầu).\n\n"
-                "🔧 Thuật toán: Hierholzer (O(E) – dùng stack)"
+                "Cần tìm: Chu trình Euler (qua mỗi cạnh 1 lần, quay đầu).\n\n"
+                "Thuật toán: Hierholzer (O(E) – dùng stack)"
             ),
             "algo": "Hierholzer",
             "nodes": ["Hub", "P1", "P2", "P3", "P4", "P5"],
@@ -1588,9 +1691,9 @@ class GraphApp:
         self._settext(
             self.r_prob,
             f"[{algo}] đang chạy trên bài toán: {key}\n\n"
-            "⏳ Chức năng thực thi sẽ được tích hợp từ\n"
+            "Chức năng thực thi sẽ được tích hợp từ\n"
             "   src/graph_algorithms/algorithms/ trong bước tiếp theo.\n\n"
-            "📊 Đồ thị minh họa đã hiển thị ở trên."
+            "Đồ thị minh họa đã hiển thị ở trên."
         )
 
     # ═══════════════════════════════════════════════════════════════════════════
@@ -1640,18 +1743,26 @@ class GraphApp:
             if w == int(w): w = int(w)
         except ValueError:
             messagebox.showerror("", "Trọng số phải là số!"); return
+        # Lỗi 4: gọi _save_state() TRƯỚC khi thêm node mới
+        self._save_state()
         for nd in (u, v):
             if nd not in self.graph: self.graph[nd] = []
         if any(nb == v for nb, _ in self.graph[u]):
             messagebox.showwarning("", f"Cạnh ({u} → {v}) đã tồn tại!"); return
-        self._save_state()
         self.graph[u].append((v, w))
         if not self.directed.get() and not any(nb == u for nb, _ in self.graph[v]):
             self.graph[v].append((u, w))
-        for e in (self.ef, self.et): e.delete(0, tk.END)
-        self.ew.delete(0, tk.END); self.ew.insert(0, "1")
+        self.ef.delete(0, tk.END)
+        self.et.delete(0, tk.END)
+        self.ew.delete(0, tk.END)
+        # Dùng after(0) để defer insert "1" vào ew sau khi tkinter hoàn tất redraw,
+        # tránh conflict layout gây nhảy dữ liệu hiển thị ở các ô khác.
+        def _restore_ew():
+            self.ew.insert(0, "1")
+            self._check_add_edge_input()
+            self.ef.focus_set()
+        self.root.after(0, _restore_ew)
         self._pos = {}; self._upd_info(); self.draw()
-        self._check_add_edge_input()
 
     def _delete_node(self):
         if not hasattr(self, 'e_del_node'): return
@@ -1673,27 +1784,18 @@ class GraphApp:
         v = self.e_del_et.get().strip()
         if not u or not v:
             messagebox.showwarning("", "Nhập cả đỉnh nguồn và đỉnh đích cần xóa!"); return
-            
-        import copy
-        old_graph = copy.deepcopy(self.graph)
-        
-        found = False
-        if u in self.graph:
-            orig_len = len(self.graph[u])
-            self.graph[u] = [(nb, w) for nb, w in self.graph[u] if nb != v]
-            if len(self.graph[u]) < orig_len: found = True
+        if u not in self.graph or not any(nb == v for nb, _ in self.graph[u]):
+            messagebox.showerror("Lỗi", f"Không tìm thấy cạnh ({u} → {v})!"); return
+        # Lỗi 5: dùng _save_state() nhất quán thay vì tự copy
+        self._save_state()
+        self.graph[u] = [(nb, w) for nb, w in self.graph[u] if nb != v]
         if not self.directed.get() and v in self.graph:
             self.graph[v] = [(nb, w) for nb, w in self.graph[v] if nb != u]
-        if found:
-            self.history.append(old_graph)
-            if len(self.history) > 50: self.history.pop(0)
-            self.e_del_ef.delete(0, tk.END)
-            self.e_del_et.delete(0, tk.END)
-            self._pos = {}; self._upd_info(); self.draw()
-            self._check_del_edge_input()
-            messagebox.showinfo("Đã xóa", f"Đã xóa cạnh ({u} → {v}).")
-        else:
-            messagebox.showerror("Lỗi", f"Không tìm thấy cạnh ({u} → {v})!")
+        self.e_del_ef.delete(0, tk.END)
+        self.e_del_et.delete(0, tk.END)
+        self._pos = {}; self._upd_info(); self.draw()
+        self._check_del_edge_input()
+        messagebox.showinfo("Đã xóa", f"Đã xóa cạnh ({u} → {v}).")
 
     def _clear(self):
         if messagebox.askyesno("Xác nhận", "Bạn có chắc chắn muốn xóa sạch toàn bộ đồ thị?"):
@@ -1859,10 +1961,16 @@ class GraphApp:
 
     @staticmethod
     def _dk(hx):
-        r = max(0, int(int(hx[1:3], 16) * 0.78))
-        g = max(0, int(int(hx[3:5], 16) * 0.78))
-        b = max(0, int(int(hx[5:7], 16) * 0.78))
-        return f"#{r:02x}{g:02x}{b:02x}"
+        """Lỗi 3: bảo vệ crash khi bg không phải mã hex (VD: tên màu hệ thống)."""
+        try:
+            if not isinstance(hx, str) or len(hx) != 7 or hx[0] != '#':
+                return hx  # trả nguyên giá trị nếu không phải hex hợp lệ
+            r = max(0, int(int(hx[1:3], 16) * 0.78))
+            g = max(0, int(int(hx[3:5], 16) * 0.78))
+            b = max(0, int(int(hx[5:7], 16) * 0.78))
+            return f"#{r:02x}{g:02x}{b:02x}"
+        except (ValueError, TypeError):
+            return hx  # fallback an toàn
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
