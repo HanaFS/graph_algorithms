@@ -1,48 +1,48 @@
 # Graph Algorithms Visualizer
 
-Giao diện đồ họa Python (tkinter + matplotlib + networkx) phong cách Qt thanh lịch, hiện đại với các nút tương tác thông minh (Reactive Glowing Buttons) và bộ công cụ Xóa.
+Một ứng dụng trực quan hóa các thuật toán đồ thị, được xây dựng bằng Python (Tkinter + Matplotlib + NetworkX). Giao diện thiết kế hiện đại, thanh lịch với các nút bấm tương tác thông minh (Reactive Buttons), hỗ trợ vẽ đồ thị động và chạy thuật toán từng bước (step-by-step).
 
-## Yêu cầu môi trường
+## 🌟 Tính năng nổi bật
 
-1. Đã cài đặt **Python 3.14** (hoặc môi trường ảo `.venv` trong thư mục dự án).
-2. Các thư viện:
+* **Giao diện thân thiện & Hiện đại**: Các nút bấm có khả năng phát sáng thông minh dựa trên ngữ cảnh người dùng nhập dữ liệu (Thêm đỉnh, thêm cạnh, xóa...).
+* **Vẽ và chỉnh sửa đồ thị linh hoạt**: Dễ dàng thêm, xóa đỉnh và cạnh, chuyển đổi linh hoạt giữa đồ thị có hướng và vô hướng.
+* **Trực quan hóa thuật toán theo từng bước**: Chức năng điều khiển (Bắt đầu, Tiến, Lùi, Kết thúc) giúp sinh viên và người dùng dễ dàng theo dõi cách các thuật toán hoạt động.
+
+## 🛠 Yêu cầu môi trường
+
+1. Đã cài đặt **Python 3.9+**.
+2. Cài đặt các thư viện yêu cầu (có thể sử dụng môi trường ảo):
+   ```bash
+   pip install -e .
+   ```
+   Hoặc cài thủ công:
    ```bash
    pip install matplotlib networkx
    ```
 
-## Cách chạy giao diện đồ họa (GUI)
+## 🚀 Hướng dẫn sử dụng
 
-Để khởi động giao diện ứng dụng:
+Khởi động giao diện chính của ứng dụng bằng lệnh:
 ```bash
-.venv/bin/python ui/graph_ui.py
+python main.py
+```
+*(Hoặc chạy qua file `ui/graph_ui.py`)*
+
+Để chạy Unit Test kiểm định logic các thuật toán:
+```bash
+python -m unittest discover -s tests/unit
 ```
 
-## Chạy Unit Test kiểm định thuật toán
+## 📂 Danh sách 6 Tab chức năng chính
 
-```bash
-.venv/bin/python -m unittest discover -s tests/unit
-```
+1. **1. Đồ thị**: Vẽ trực quan, thêm/xóa đỉnh cạnh, chuyển đổi Vô hướng $\leftrightarrow$ Có hướng, tự động căn chỉnh và xuất ảnh.
+2. **2. Biểu diễn**: Tự động trích xuất các biểu diễn đồ thị: Ma trận kề, Danh sách kề, Danh sách cạnh (3 cột song song).
+3. **3. Duyệt BFS/DFS**: Trực quan hóa thuật toán Tìm kiếm theo chiều rộng (BFS) và Tìm kiếm theo chiều sâu (DFS), hiển thị cây khung duyệt và thứ tự thăm.
+4. **4. Hai phía**: Kiểm tra đồ thị 2 phía (Bipartite), tự động tô màu 2 tập đỉnh độc lập A/B.
+5. **5. Đường ngắn nhất**: Thuật toán Dijkstra & Bellman-Ford, hiển thị bảng khoảng cách từng bước.
+6. **6. Thuật toán nâng cao**:
+   * **Fleury & Hierholzer**: Tìm đường đi / chu trình Euler.
+   * **Prim & Kruskal**: Tìm cây khung nhỏ nhất (Minimum Spanning Tree).
+   * **Ford-Fulkerson**: Tìm luồng cực đại trong mạng luồng (Max Flow).
 
-## Các tính năng tương tác nổi bật
 
-* **💡 Nút "+ Thêm đỉnh" tự động sáng đèn**:
-  * Khi gõ tên đỉnh vào ô nhập: Nút lập tức phát sáng tím neon rực rỡ `💡 Thêm đỉnh`.
-  * Khi ô nhập trống: Nút tự động chuyển về trạng thái mờ dịu (`+ Thêm đỉnh`).
-* **✨ Nút "+ Thêm cạnh" tự động sáng đèn**:
-  * Khi nhập đủ cả đỉnh Từ (From) và Đến (To): Nút lập tức phát sáng Cyan nổi bật `✨ Thêm cạnh`.
-  * Khi chưa đủ thông tin: Nút ở trạng thái mờ dịu.
-* **💡 Nút "Vẽ lại" & "Lưu hình" tự động sáng đèn**:
-  * Khi đồ thị có dữ liệu: Các nút `💡 ↺ Vẽ lại`, `💡 💾 Lưu hình` tự động sáng đèn rực rỡ.
-  * Khi đồ thị trống: Các nút chuyển về màu mờ nền nã.
-* **🔥 Mục "Xóa đỉnh & Cạnh" (Delete Tools)**:
-  * **Xoá 1 đỉnh**: Ô nhập tên đỉnh cần xoá $\rightarrow$ Khi gõ vào, nút sáng đèn đỏ `🔥 Xoá đỉnh`.
-  * **Xoá 1 cạnh**: Ô nhập cạnh cần xoá (Từ $\rightarrow$ Đến) $\rightarrow$ Khi gõ vào, nút sáng đèn đỏ `🔥 Xoá cạnh`.
-  * **Xoá toàn bộ đồ thị**: Nút `✕ Xóa sạch toàn bộ đồ thị` với hộp thoại xác nhận an toàn.
-
-## Danh sách 5 Tab chức năng
-
-1. **1. Đồ thị**: Vẽ trực quan, chuyển đổi Vô hướng $\leftrightarrow$ Có hướng, nút *Vẽ lại* và *Lưu hình*.
-2. **2. Biểu diễn**: Ma trận kề, Danh sách kề, Danh sách cạnh (3 cột song song).
-3. **3. Duyệt BFS/DFS**: Duyệt BFS & DFS và so sánh kết quả chạy tay.
-4. **4. Hai phía**: Kiểm tra đồ thị 2 phía (Bipartite), tô màu 2 tập đỉnh A/B.
-5. **5. Đường ngắn nhất**: Dijkstra & Bellman-Ford, bảng khoảng cách và so sánh chạy tay.

@@ -6,7 +6,16 @@ setup(
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     install_requires=[
-        # Thêm các thư viện cần thiết ở đây
+        "matplotlib>=3.7.0",
+        "networkx>=3.0",
     ],
-    python_requires=">=3.8",
+    extras_require={
+        "dev": [
+            "pytest>=7.0",
+            "black>=21.0",
+            "pylint>=2.12",
+            "flake8>=4.0",
+        ],
+    },
+    python_requires=">=3.9",
 )
