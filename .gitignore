@@ -25,3 +25,6 @@ __pycache__/
 dist/
 build/
 *.egg-info/
+__pycache__/
+*.exe
+*.spec
