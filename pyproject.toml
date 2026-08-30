@@ -4,10 +4,21 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "graph-algorithms"
-version = "1.0.0"
+version = "0.1.0"
 description = "Interactive graph algorithms visualizer and solver"
 requires-python = ">=3.9"
-dependencies = []
+dependencies = [
+    "matplotlib>=3.7.0",
+    "networkx>=3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "black>=21.0",
+    "pylint>=2.12",
+    "flake8>=4.0",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
