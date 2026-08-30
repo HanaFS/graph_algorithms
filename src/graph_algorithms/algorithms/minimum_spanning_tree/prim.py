@@ -8,9 +8,17 @@ Thuật toán Prim – Cây khung nhỏ nhất (Minimum Spanning Tree)
 - Lặp cho đến khi tất cả đỉnh đã vào MST.
 
 Độ phức tạp: O(E log V) với heap nhị phân.
+
+Ghi chú:
+- Thuật toán hoạt động đúng với trọng số âm (khác Dijkstra).
+- Đỉnh bị cô lập (không có cạnh nào) được coi là "không tới được"
+  và được báo cáo trong bước cuối là đồ thị không liên thông.
+- Tie-breaking dùng counter tăng dần để tránh crash khi so sánh
+  node không cùng kiểu dữ liệu (Python so sánh tuple từ trái sang phải).
 """
 
 import heapq
+import itertools
 from typing import Dict, List, Tuple, Optional
 
 
@@ -34,6 +42,12 @@ def prim(graph: Graph, root: str) -> Tuple[List[Tuple[str, str, float]], float, 
 
     Raises:
         ValueError: nếu root không tồn tại trong graph, hoặc graph rỗng.
+
+    Edge cases:
+        - Đồ thị 1 đỉnh (root duy nhất): trả về mst_edges=[], total=0.0, OK.
+        - Đồ thị không liên thông: trả về MST của thành phần chứa root,
+          bước cuối trong steps ghi rõ các đỉnh không tới được.
+        - Cạnh song song (multi-edge): tự động chọn cạnh nhẹ nhất qua heap.
     """
     if not graph:
         raise ValueError("Đồ thị rỗng.")
@@ -45,13 +59,16 @@ def prim(graph: Graph, root: str) -> Tuple[List[Tuple[str, str, float]], float, 
     steps: List[Step] = []
     total_cost: float = 0.0
 
-    # heap: (weight, from_node, to_node)
-    heap: List[Tuple[float, str, str]] = []
+    # Counter tăng dần làm tie-breaker: đảm bảo heap không crash khi
+    # hai cạnh có cùng trọng số và Python cố so sánh tên node.
+    # heap entry: (weight, tie_counter, from_node, to_node)
+    _counter = itertools.count()
+    heap: list = []
 
     def _push_edges(node: str):
         for neighbor, w in graph[node]:
             if neighbor not in visited:
-                heapq.heappush(heap, (w, node, neighbor))
+                heapq.heappush(heap, (w, next(_counter), node, neighbor))
 
     visited.add(root)
     _push_edges(root)
@@ -65,10 +82,10 @@ def prim(graph: Graph, root: str) -> Tuple[List[Tuple[str, str, float]], float, 
     })
 
     while heap and len(visited) < len(graph):
-        w, u, v = heapq.heappop(heap)
+        w, _, u, v = heapq.heappop(heap)   # bỏ tie-breaker _
 
         if v in visited:
-            continue  # bỏ qua cạnh ngược
+            continue  # bỏ qua cạnh "stale" (v đã vào MST qua đường khác)
 
         # Thêm cạnh (u → v) vào MST
         visited.add(v)
