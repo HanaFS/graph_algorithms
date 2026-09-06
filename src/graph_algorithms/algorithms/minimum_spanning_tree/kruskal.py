@@ -101,7 +101,7 @@ def kruskal(graph: Graph) -> Tuple[List[Tuple[str, str, float]], float, List[Ste
             "mst_edges": list(mst_edges),
             "description": (
                 f"Xét cạnh ({u} — {v}), w={w}. "
-                + ("✔ Thêm vào MST." if accepted else "✘ Bỏ qua (tạo chu trình).")
+                + ("Thêm vào MST." if accepted else "Bỏ qua (tạo chu trình).")
             ),
         })
 
