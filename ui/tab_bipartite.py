@@ -53,7 +53,7 @@ class Tab4Mixin:
         bipartite graph.
         """
         if not self.graph:
-            self.bip_r.config(text="⚠ Đồ thị đang trống", fg=WARNING)
+            self.bip_r.config(text="Đồ thị đang trống", fg=WARNING)
             self.bip_d.config(text="Hãy thêm ít nhất một đỉnh và một cạnh rồi kiểm tra lại.")
             self.draw(ax=self.ax4, cv=self.cv4)
             return
@@ -91,7 +91,7 @@ class Tab4Mixin:
         if ok:
             group_a = sorted([n for n, c in color.items() if c == 0])
             group_b = sorted([n for n, c in color.items() if c == 1])
-            self.bip_r.config(text="✓ ĐỒ THỊ LÀ HAI PHÍA (BIPARTITE)", fg=SUCCESS)
+            self.bip_r.config(text="ĐỒ THỊ LÀ HAI PHÍA (BIPARTITE)", fg=SUCCESS)
             self.bip_d.config(
                 text=(f"Tập A = {{ {', '.join(group_a)} }}    |    "
                       f"Tập B = {{ {', '.join(group_b)} }}\n"
@@ -105,7 +105,7 @@ class Tab4Mixin:
                       title="Bipartite: Tập A / Tập B")
         else:
             u, v = conflict
-            self.bip_r.config(text="✗ ĐỒ THỊ KHÔNG PHẢI HAI PHÍA", fg=ERROR)
+            self.bip_r.config(text="ĐỒ THỊ KHÔNG PHẢI HAI PHÍA", fg=ERROR)
             self.bip_d.config(
                 text=(f"Phát hiện xung đột tại cạnh ({u}, {v}): "
                       f"hai đỉnh phải thuộc hai tập khác nhau nhưng hiện cùng màu.\n"

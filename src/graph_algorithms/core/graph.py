@@ -4,5 +4,4 @@ class Graph:
     """
     def __init__(self, directed: bool = False):
         self.directed = directed
-        # Khởi tạo biểu diễn đồ thị ở đây
         pass
