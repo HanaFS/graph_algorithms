@@ -17,7 +17,7 @@ from .tab_traversal import Tab3Mixin
 from .tab_bipartite import Tab4Mixin
 from .tab_shortest import Tab5Mixin
 from .tab_advanced import Tab6Mixin
-
+from .tab_bus_route import Tab7Mixin
 
 class GraphApp(
     SidebarMixin,
@@ -27,6 +27,7 @@ class GraphApp(
     Tab4Mixin,
     Tab5Mixin,
     Tab6Mixin,
+    Tab7Mixin,
 ):
     """
     Main Application Class for Graph Algorithms.
@@ -83,6 +84,7 @@ class GraphApp(
             ("4. Hai phía", self._tab4),
             ("5. Đường đi ngắn nhất", self._tab5),
             ("6. Thuật toán nâng cao", self._tab6),
+            ("7. Tìm tuyến xe buýt", self._tab7),
         ]
 
         for title, builder in tabs_info:
